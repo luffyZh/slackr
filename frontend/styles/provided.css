@@ -1,0 +1,330 @@
+/* Base styles - feel free to modify */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, 'Open Sans', 'Helvetica Neue', sans-serif;
+	background-color: #48224b;
+}
+
+/* Utility class to hide elements */
+.hidden {
+    display: none !important;
+}
+
+.banner{
+	color: #f8efff;
+}
+
+/* Authentication containers (login/register forms) */
+.auth-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f8efff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Form group styling for consistent spacing */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Base button styling */
+button {
+    background-color: #88448c;
+    color: #f8efff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #f8efff;
+	color: #88448c;
+}
+
+/* Error container (background overlay) */
+.error-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Error popup box */
+.error-popup {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    position: relative;
+    min-width: 300px;
+}
+
+/* Close button for error popup */
+.error-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+    padding: 0;
+}
+
+.error-close:hover {
+    background-color: transparent;
+    color: #666;
+}
+
+/* Dashboard layout */
+#dashboard-container {
+    display: flex;
+    height: calc(100vh - 120px); /* Adjust based on header/footer height */
+}
+
+/* Sidebar containing channel lists */
+.sidebar {
+    width: 15%;
+	background-color: #59365e;
+    padding: 15px;
+    overflow-y: auto;
+	color: white;
+}
+
+/* Main content area for messages and channel details */
+.main-content {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+/* Channel list containers */
+.channel-list {
+    margin-bottom: 20px;
+}
+
+/* Individual channel items */
+.channel-container {
+    padding: 8px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.channel-container:hover {
+    opacity: 0.9;
+}
+
+/* Individual message containers */
+.message-container {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.message-avatar{
+	width: 50px;
+	height: 50px;
+}
+
+/* Message input area at the bottom of channels */
+.message-input-area {
+    display: flex;
+    margin-top: 15px;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Message input field */
+#message-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 40px;
+    resize: vertical;
+}
+
+/* Header actions (profile, logout buttons) */
+.header-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.header-actions button {
+    margin-left: 10px;
+}
+
+/* Modal background overlay */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Modal content box */
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+/* Close button for modals */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+.close-button:hover {
+    color: #666;
+}
+
+/* Styling for usernames in messages */
+.message-user-name {
+    font-weight: bold;
+    cursor: pointer;
+    color: #007bff;
+}
+
+.message-user-name:hover {
+    text-decoration: underline;
+}
+
+/* Message images */
+.message-image {
+    max-width: 200px;
+    max-height: 200px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 5px 0;
+    transition: transform 0.2s;
+}
+
+.message-image:hover {
+    transform: scale(1.02);
+}
+
+/* Message action buttons (edit/delete) */
+.message-actions {
+    margin-top: 5px;
+}
+
+.message-edit-button, .message-delete-button {
+    background-color: transparent;
+    color: #666;
+    padding: 5px 10px;
+    margin-right: 5px;
+    font-size: 12px;
+    border: 1px solid transparent;
+}
+
+.message-edit-button:hover, .message-delete-button:hover {
+    background-color: #f0f0f0;
+    border-color: #ddd;
+}
+
+/* Image upload button */
+.image-upload-button {
+    cursor: pointer;
+    font-size: 20px;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    transition: background-color 0.2s;
+}
+
+.image-upload-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Channel details container */
+#channel-details-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+#create-channel-button{
+	width: 100%;
+	font-size: 1.5rem;
+}
+
+#create-channel-submit{
+	width: 100%;
+}
+
+.channel-container.selected {
+    background-color: #4a2c51;
+    color: white;
+    font-weight: bold;
+}
+
+
+.empty-channel-message {
+    padding: 8px;
+    color: #b0a0b5;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.unread-badge {
+    background-color: #eb0000;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+#profile-image{
+	width: 100px;
+	height: 100px;
+}

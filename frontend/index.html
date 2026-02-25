@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Slackr</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- You can add your styles and scripts here -->
+		<link rel="stylesheet" type="text/css" media="screen" href="styles/provided.css" />
+		<script type="module" src="src/helpers.js"></script>
+	</head>
+
+	<body>
+
+		<!-- Error popup window -->
+		<div id="error-container" class="hidden error-container">
+			<div class="error-popup">
+				<button id="error-close" class="error-close">&times;</button>
+				<div id="error-body" class="error-body"></div>
+			</div>
+		</div>
+
+		<header class="banner">
+			<h1>Slackr</h1>
+		</header>
+
+		<main role="main">
+			<!-- Login form -->
+			<div id="login-container" class="auth-container">
+				<h2>Login</h2>
+				<form id="login-form">
+					<div class="form-group">
+						<label for="login-email">email</label>
+						<input type="email" id="login-email" required>
+					</div>
+					<div class="form-group">
+						<label for="login-password">password</label>
+						<input type="password" id="login-password" required>
+					</div>
+					<button type="submit" id="login-submit">login</button>
+					<a href="#" id="register-link">register</a>
+				</form>
+			</div>
+
+			<!-- Registration form -->
+			<div id="register-container" class="auth-container hidden">
+				<h2>Registration</h2>
+				<form id="register-form">
+					<div class="form-group">
+						<label for="register-email">email</label>
+						<input type="email" id="register-email" required>
+					</div>
+					<div class="form-group">
+						<label for="register-name">name</label>
+						<input type="text" id="register-name" required>
+					</div>
+					<div class="form-group">
+						<label for="register-password">password</label>
+						<input type="password" id="register-password" required>
+					</div>
+					<div class="form-group">
+						<label for="register-password-confirm">password-confirm</label>
+						<input type="password" id="register-password-confirm" required>
+					</div>
+					<button type="submit" id="register-submit">register</button>
+					<a href="#" id="login-link">login</a>
+				</form>
+			</div>
+
+			<!-- Dashboard/homepage -->
+			<div id="dashboard-container" class="hidden">
+				<div class="sidebar">
+					<button id="create-channel-button">Create a new channel</button>
+					<h3>Public Channels</h3>
+					<div id="public-channel-list" class="channel-list"></div>
+					<h3>Private Channels</h3>
+					<div id="private-channel-list" class="channel-list"></div>
+				</div>
+
+				<div class="main-content">
+					<div class="header-actions">
+						<button id="avatar-image">Personal Profile</button>
+						<button id="logout-button">Log out</button>
+					</div>
+
+					<div id="channel-details-container" class="hidden">
+					</div>
+
+					<div id="messages-container"></div>
+					<div class="message-input-area">
+						<input type="file" id="message-image-upload" accept="image/*" style="display: none;">
+						<label for="message-image-upload" class="image-upload-button">P</label>
+						<input type="text" id="message-input" placeholder="enter message ...">
+						<button id="message-send-button">Send</button>
+					</div>
+				</div>
+
+				<!-- Other user's profile modal -->
+				<div id="profile-container" class="modal hidden">
+					<div class="modal-content">
+						<span class="close-button">&times;</span>
+						<div id="profile-content"></div>
+					</div>
+				</div>
+
+				<!-- Own profile container -->
+				<div id="own-profile-container" class="modal hidden">
+					<div class="modal-content">
+						<span class="close-button">&times;</span>
+						<div id="own-profile-content"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Create new channel form modal -->
+			<div id="create-channel-container" class="modal hidden">
+				<div class="modal-content">
+					<span class="close-button">&times;</span>
+					<h2>Create a new channel</h2>
+					<form id="create-channel-form">
+						<div class="form-group">
+							<label for="create-channel-name">name</label>
+							<input type="text" id="create-channel-name" required>
+						</div>
+						<div class="form-group">
+							<label for="create-channel-description">description</label>
+							<textarea id="create-channel-description"></textarea>
+						</div>
+						<div class="form-group">
+							<label>
+								<input type="checkbox" id="create-channel-is-private">
+								private
+							</label>
+						</div>
+						<button type="submit" id="create-channel-submit">create</button>
+					</form>
+				</div>
+			</div>
+
+			<!-- Channel invite user modal -->
+			<div id="channel-invite-container" class="modal hidden">
+				<div class="modal-content">
+					<span class="close-button">&times;</span>
+					<h2>Invite Users to Channel</h2>
+					<div id="users-to-invite-list"></div>
+					<button id="invite-submit-button">Invite Selected</button>
+				</div>
+			</div>
+		</main>
+
+		<footer style="color: #f8efff;text-align: center;">
+			<p>&copy; Slackr</p>
+		</footer>
+
+		<script type="module" src="./src/main.js"></script>
+	</body>
+</html>
