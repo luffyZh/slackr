@@ -65,8 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		setupEventListeners();
 
 		if (isLoggedIn()) {
+			const userId = localStorage.getItem('userId');
+			console.log('isLogined: ', isLoggedIn(), 'userId: ', userId);
 			try {
-				const userData = await apiRequest('/users/me');
+				const userData = await apiRequest(`/user/${userId}`);
+				console.log('Me data: ', userData);
 				currentUser = userData;
 				showDashboard();
 				loadChannels();
@@ -213,7 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			// };
 
 			localStorage.setItem(STORAGE_KEY, data.token);
+			// FIXME: 这里处理登录后获取用户信息的逻辑，尽量不修改你的原本代码
 			currentUser = data.user;
+			// FIXME: 缓存 userId 下来
+			localStorage.setItem('userId', data.userId);
 			showDashboard();
 			loadChannels();
 			loginForm.reset();
