@@ -62,12 +62,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	async function init() {
+		setTimeout(() => {
+			document.getElementById('loading-page').style.display = 'none';
+		}, 3000);
 		setupEventListeners();
 
 		if (isLoggedIn()) {
+			// FIXME: 初始化获取 userId
 			const userId = localStorage.getItem('userId');
 			console.log('isLogined: ', isLoggedIn(), 'userId: ', userId);
 			try {
+				// FIXME: 根据 userId 获取用户数据
 				const userData = await apiRequest(`/user/${userId}`);
 				console.log('Me data: ', userData);
 				currentUser = userData;
