@@ -272,7 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	async function loadChannels() {
-		const channels = await apiRequest('/channels');
+		// FIXME: 修改 /channels -> channel，对返回数据进行解构
+		const { channels } = await apiRequest('/channel');
 
 		clearElement(publicChannelList);
 		clearElement(privateChannelList);
