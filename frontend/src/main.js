@@ -75,7 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
 				// FIXME: 根据 userId 获取用户数据
 				const userData = await apiRequest(`/user/${userId}`);
 				console.log('Me data: ', userData);
-				currentUser = userData;
+				// FIXME: 修复 currentUser 没有 id 的问题
+				currentUser = {
+					id: +userId,
+					...userData
+				};
 				showDashboard();
 				loadChannels();
 				setupHashRouting(); 
@@ -145,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (hash.startsWith('#channel=')) {
 			const channelId = hash.split('=')[1];
+			console.log('channelId: ', channelId);
 			await loadChannelById(channelId);
 		} else if (hash === '#profile') {
 			showOwnProfile();
@@ -158,7 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		try {
 			// FIXME: channels -> channel，为啥 API 全错了，得思考一下，是 server 版本不一样，还是因为 AI 写的
 			const channel = await apiRequest(`/channel/${channelId}`);
-			currentChannel = channel;
+			// FIXME: channel 里面没有 id 字段，重新构造 currentChannel
+			currentChannel = {
+				...channel,
+				id: channelId,
+			};
+			console.log('channel: ', currentChannel);
 			loadChannelDetails();
 			loadMessages();
 		} catch (error) {
@@ -579,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const actionsDiv = document.createElement('div');
 		actionsDiv.className = 'message-actions';
 		contentDiv.appendChild(actionsDiv);
-
+		console.log('currentUser: ', currentUser);
 		// FIXME: 你的代码逻辑里就没有获取 user 的逻辑，所以要通过 message.sender 来判断
 		if (message.sender === currentUser.id) {
 			const editBtn = document.createElement('button');
