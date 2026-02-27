@@ -62,11 +62,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	async function init() {
+		// FIXME: 5s 后让 loading 页面消失
+		setTimeout(() => {
+			document.getElementById('loading-page').style.display = 'none';
+		}, 3000);
 		setupEventListeners();
 
 		if (isLoggedIn()) {
 			try {
-				const userData = await apiRequest('/users/me');
+				// FIXME: 根据缓存的 userId 获取用户详情
+				const userId = +localStorage.getItem('userId');
+				const userData = await apiRequest(`/user/${userId}`);
 				currentUser = userData;
 				showDashboard();
 				loadChannels();
@@ -213,6 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			// };
 
 			localStorage.setItem(STORAGE_KEY, data.token);
+			// FIXME: 缓存 userId 下来
+			localStorage.setItem('userId', data.userId)
 			currentUser = data.user;
 			showDashboard();
 			loadChannels();
@@ -261,10 +269,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	async function loadChannels() {
-		const channels = await apiRequest('/channels');
+		// FIXME: /channels -> /channel，把 channels 从返回对象解构出来
+		const { channels } = await apiRequest('/channel');
 
 		clearElement(publicChannelList);
 		clearElement(privateChannelList);
+
+		// FIXME: 优化一个新的 bug
 
 		const publicChannels = channels.filter(channel => !channel.isPrivate);
 		const privateChannels = channels.filter(channel => channel.isPrivate);
