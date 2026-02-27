@@ -156,7 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	async function loadChannelById(channelId) {
 		try {
-			const channel = await apiRequest(`/channels/${channelId}`);
+			// FIXME: channels -> channel，为啥 API 全错了，得思考一下，是 server 版本不一样，还是因为 AI 写的
+			const channel = await apiRequest(`/channel/${channelId}`);
 			currentChannel = channel;
 			loadChannelDetails();
 			loadMessages();
@@ -374,7 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (!currentChannel) return;
 
 		try {
-			const details = await apiRequest(`/channels/${currentChannel.id}`);
+			// FIXME: 修复 API 调用，从 /channels 到 /channel
+			const details = await apiRequest(`/channel/${currentChannel.id}`);
 			const container = document.getElementById('channel-details-container');
 
 			clearElement(container);
@@ -433,11 +435,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	// FIXME: 获取消息的位置
+	const MESSAGE_START = 0;
+
 	async function loadMessages() {
 		if (!currentChannel) return;
 
 		try {
-			const messages = await apiRequest(`/channels/${currentChannel.id}/messages`);
+			// FIXME: 修复 API 调用，从 /channel/{channelId}/messages 到 /message/{channelId}，然后把 messages 解构出来
+			const { messages } = await apiRequest(`/message/${currentChannel.id}?start=${MESSAGE_START}`);
 
 			// const messages = [{
 			// 	user:{profileImage:"https://q3.itc.cn/q_70/images03/20250110/1e71eecf56b34344bcae6a5b85c0bec2.jpeg",name:"user1",id:"1"},
@@ -518,11 +524,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		const div = document.createElement('div');
 		div.className = 'message-container';
 
-		const avatarUrl = message.user.profileImage || 'default-avatar.png';
+		// FIXME: 不确定是否有 user 这个对象
+		const avatarUrl = message?.user?.profileImage || 'default-avatar.png';
 
 		const avatarImg = document.createElement('img');
 		avatarImg.className = 'message-avatar';
-		avatarImg.alt = message.user.name;
+		// FIXME: 不确定是否有 user 这个对象
+		avatarImg.alt = message?.user?.name || 'Unknown User';
 		avatarImg.src = avatarUrl;
 		div.appendChild(avatarImg);
 
@@ -536,8 +544,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const nameSpan = document.createElement('span');
 		nameSpan.className = 'message-user-name';
-		nameSpan.dataset.userId = message.user.id;
-		nameSpan.textContent = message.user.name;
+		// FIXME: 不确定是否有 user 这个对象
+		nameSpan.dataset.userId = message?.user?.id || 'unknown';
+		nameSpan.textContent = message?.user?.name || 'Unknown User';
 		headerDiv.appendChild(nameSpan);
 
 		const timeSpan = document.createElement('span');
@@ -571,7 +580,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		actionsDiv.className = 'message-actions';
 		contentDiv.appendChild(actionsDiv);
 
-		if (message.user.id === currentUser.id) {
+		// FIXME: 你的代码逻辑里就没有获取 user 的逻辑，所以要通过 message.sender 来判断
+		if (message.sender === currentUser.id) {
 			const editBtn = document.createElement('button');
 			editBtn.className = 'message-edit-button';
 			editBtn.dataset.messageId = message.id;
