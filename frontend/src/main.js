@@ -275,6 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		clearElement(publicChannelList);
 		clearElement(privateChannelList);
 
+		// FIXME: 优化一个新的 bug
+
 		const publicChannels = channels.filter(channel => !channel.isPrivate);
 		const privateChannels = channels.filter(channel => channel.isPrivate);
 
