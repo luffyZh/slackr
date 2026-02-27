@@ -100,7 +100,8 @@ export async function apiRequest(endpoint, method = 'GET', data = null, requireA
 	};
 	
 	if (requireAuth) {
-		const token = localStorage.getItem(storage_KEY);
+		// FIXME: 马虎，传进来的是 STORAGE_KEY，你使用的是 storage_KEY
+		const token = localStorage.getItem(STORAGE_KEY);
 		if (!token) {
 			window.location.href = '#login';
 			throw new Error('Need to log in.');
