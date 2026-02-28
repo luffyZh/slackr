@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	let currentUser = null;
 	let currentChannel = null;
-
+	// FIXME: 初始化获取所有用户数据并存下来
+	const allUsers = [];
 
 	async function init() {
 		setTimeout(() => {
@@ -68,6 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		setupEventListeners();
 
 		if (isLoggedIn()) {
+			// FIXME: 登陆成功，初始化获取所有用户数据并存下来
+			const { users } = await apiRequest('/user');
+			allUsers.push(...users);
 			// FIXME: 初始化获取 userId
 			const userId = localStorage.getItem('userId');
 			console.log('isLogined: ', isLoggedIn(), 'userId: ', userId);
@@ -233,11 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			localStorage.setItem(STORAGE_KEY, data.token);
 			// FIXME: 这里处理登录后获取用户信息的逻辑，尽量不修改你的原本代码
-			const user = await apiRequest(`/user/${data.userId}`);
 			currentUser = {
 				id: +data.userId,
-				...user
+				email,
 			};
+			// FIXME: 登陆成功，初始化获取所有用户数据并存下来
+			const { users } = await apiRequest('/user');
+			allUsers.push(...users);
 			// FIXME: 缓存 userId 下来
 			localStorage.setItem('userId', data.userId);
 			showDashboard();
@@ -269,7 +275,16 @@ document.addEventListener('DOMContentLoaded', () => {
 			}, false);
 
 			localStorage.setItem(STORAGE_KEY, data.token);
-			currentUser = data.user;
+			// FIXME: 缓存 userId 下来
+			localStorage.setItem('userId', data.userId);
+			currentUser = {
+				id: +data.userId,
+				email,
+				name,
+			};
+			// FIXME: 登陆成功，初始化获取所有用户数据并存下来
+			const { users } = await apiRequest('/user');
+			allUsers.push(...users);
 			showDashboard();
 			loadChannels();
 			registerForm.reset();
@@ -420,16 +435,19 @@ document.addEventListener('DOMContentLoaded', () => {
 			createdStrong.textContent = 'Created:';
 			createdP.appendChild(createdStrong);
 			createdP.appendChild(
-				document.createTextNode(' ' + formatDate(details.timeCreated))
+				// FIXME: 后端返回字段是 createdAt，前端需要转换为 Date 对象
+				document.createTextNode(' ' + formatDate(new Date(details.createdAt)))
 			);
 			container.appendChild(createdP);
 
+			// FIXME: details.creator 是用户 id，需要从 allUsers 中找到对应的用户
+			const creator = allUsers.find(user => user.id === details.creator);
 			const creatorP = document.createElement('p');
 			const creatorStrong = document.createElement('strong');
 			creatorStrong.textContent = 'Creator:';
 			creatorP.appendChild(creatorStrong);
 			creatorP.appendChild(
-				document.createTextNode(' ' + details.creator.name)
+				document.createTextNode(' ' + creator?.email || 'Unknown')
 			);
 			container.appendChild(creatorP);
 
