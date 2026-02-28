@@ -556,14 +556,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	function createMessageElement(message) {
 		const div = document.createElement('div');
 		div.className = 'message-container';
+		// FIXME: 确定发送者是谁
+		const sender = allUsers.find(user => user.id === message.sender);
 
 		// FIXME: 不确定是否有 user 这个对象
-		const avatarUrl = message?.user?.profileImage || 'default-avatar.png';
+		const avatarUrl = message.sender === currentUser.id ? 'me.png' : sender?.profileImage || 'default-avatar.png';
 
 		const avatarImg = document.createElement('img');
 		avatarImg.className = 'message-avatar';
 		// FIXME: 不确定是否有 user 这个对象
-		avatarImg.alt = message?.user?.name || 'Unknown User';
+		avatarImg.alt = sender?.email || 'Unknown User';
 		avatarImg.src = avatarUrl;
 		div.appendChild(avatarImg);
 
@@ -578,19 +580,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		const nameSpan = document.createElement('span');
 		nameSpan.className = 'message-user-name';
 		// FIXME: 不确定是否有 user 这个对象
-		nameSpan.dataset.userId = message?.user?.id || 'unknown';
-		nameSpan.textContent = message?.user?.name || 'Unknown User';
+		nameSpan.dataset.userId = sender?.id || 'unknown';
+		nameSpan.textContent = sender?.email || 'Unknown User';
 		headerDiv.appendChild(nameSpan);
 
 		const timeSpan = document.createElement('span');
 		timeSpan.className = 'message-timestamp';
-		timeSpan.textContent = formatDate(message.timeSent);
+		// FIXME: 确定时间戳的格式
+		timeSpan.textContent = formatDate(new Date(message.sentAt));
 		headerDiv.appendChild(timeSpan);
 
 		if (message.edited) {
 			const editedSpan = document.createElement('span');
 			editedSpan.className = 'message-edited';
-			editedSpan.textContent = `Edited ${formatDate(message.edited)}`;
+			editedSpan.textContent = `Edited ${formatDate(new Date(message.edited))}`;
 			headerDiv.appendChild(editedSpan);
 		}
 
