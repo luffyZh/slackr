@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				email,
 				name,
 			};
-			// FIXME: 登陆成功，初始化获取所有用户数据并存下来
+			// FIXME: 注册成功，初始化获取所有用户数据并存下来
 			const { users } = await apiRequest('/user');
 			allUsers.push(...users);
 			showDashboard();
@@ -308,8 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		clearElement(publicChannelList);
 		clearElement(privateChannelList);
 
-		const publicChannels = channels.filter(channel => !channel.isPrivate);
-		const privateChannels = channels.filter(channel => channel.isPrivate);
+		const publicChannels = channels.filter(channel => !channel.private);
+		const privateChannels = channels.filter(channel => channel.private);
 
 		if (publicChannels.length === 0) {
 			const msg = document.createElement('div');
@@ -338,13 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function createChannelElement(channel) {
 		const div = document.createElement('div');
-		div.className = `channel-container ${channel.isPrivate ? 'private' : 'public'}`;
+		div.className = `channel-container ${channel.private ? 'private' : 'public'}`;
 		div.dataset.channelId = channel.id;
 
 		const nameDiv = document.createElement('div');
 		nameDiv.className = 'channel-name';
 		nameDiv.textContent = channel.name;
-
 
 		if (channel.unreadCount > 0) {
 			const unreadBadge = document.createElement('span');
@@ -355,8 +354,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		div.appendChild(nameDiv);
 
+		// FIXME: 如果没有在当前频道 members 列表中，右侧应该显示 Join 按钮
+		const isJoined = channel.members.includes(currentUser.id);
+		if (!isJoined) {
+			const joinBtn = document.createElement('button');
+			joinBtn.textContent = 'Join';
+			joinBtn.className = 'join-btn';
+			joinBtn.addEventListener('click', async (e) => {
+				e.stopPropagation();
+				try {
+					await apiRequest(`/channel/${channel.id}/join`, 'POST');
+					loadChannels();
+				} catch (error) {
+					console.error('Failed to join channel:', error);
+				}
+			});
+			nameDiv.appendChild(joinBtn);
+		}
 
-		div.addEventListener('click', async () => {
+		nameDiv.addEventListener('click', async () => {
 			currentChannel = channel;
 			window.location.hash = `#channel=${channel.id}`;
 			loadChannelDetails();
