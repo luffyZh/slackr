@@ -402,10 +402,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		try {
-			await apiRequest('/channels', 'POST', {
+			await apiRequest('/channel', 'POST', {
 				name,
 				description,
-				isPrivate
+				private: isPrivate,
 			});
 
 			createChannelContainer.classList.add('hidden');
