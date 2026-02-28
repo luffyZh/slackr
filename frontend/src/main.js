@@ -233,7 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			localStorage.setItem(STORAGE_KEY, data.token);
 			// FIXME: 这里处理登录后获取用户信息的逻辑，尽量不修改你的原本代码
-			currentUser = data.user;
+			const user = await apiRequest(`/user/${data.userId}`);
+			currentUser = {
+				id: +data.userId,
+				...user
+			};
 			// FIXME: 缓存 userId 下来
 			localStorage.setItem('userId', data.userId);
 			showDashboard();
@@ -495,7 +499,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		try {
-			await apiRequest(`/channels/${currentChannel.id}/messages`, 'POST', {
+			// FIXME: 发送消息的 API 调用错误：从 /channels/{channelId}/messages 到 /message/{channelId}
+			await apiRequest(`/message/${currentChannel.id}`, 'POST', {
 				message: content
 			});
 
