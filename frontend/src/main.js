@@ -62,11 +62,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	async function init() {
+		setTimeout(() => {
+			document.getElementById('loading-page').style.display = 'none';
+		}, 3000);
 		setupEventListeners();
 
 		if (isLoggedIn()) {
+			// FIXME: 初始化获取 userId
+			const userId = localStorage.getItem('userId');
+			console.log('isLogined: ', isLoggedIn(), 'userId: ', userId);
 			try {
-				const userData = await apiRequest('/users/me');
+				// FIXME: 根据 userId 获取用户数据
+				const userData = await apiRequest(`/user/${userId}`);
+				console.log('Me data: ', userData);
 				currentUser = userData;
 				showDashboard();
 				loadChannels();
@@ -213,7 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			// };
 
 			localStorage.setItem(STORAGE_KEY, data.token);
+			// FIXME: 这里处理登录后获取用户信息的逻辑，尽量不修改你的原本代码
 			currentUser = data.user;
+			// FIXME: 缓存 userId 下来
+			localStorage.setItem('userId', data.userId);
 			showDashboard();
 			loadChannels();
 			loginForm.reset();
@@ -261,7 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	async function loadChannels() {
-		const channels = await apiRequest('/channels');
+		// FIXME: 修改 /channels -> channel，对返回数据进行解构
+		const { channels } = await apiRequest('/channel');
 
 		clearElement(publicChannelList);
 		clearElement(privateChannelList);
