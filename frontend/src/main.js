@@ -908,10 +908,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				const bio = bioTextarea.value.trim();
 				const newPassword = pwInput.value.trim();
 
-				const updateData = { name, email, bio };
+				const updateData = { name, bio };
 				if (newPassword) updateData.password = newPassword;
-
-				const updatedUser = await apiRequest('/users/me', 'PATCH', updateData);
+				// FIXME: 更新个人信息
+				const updatedUser = await apiRequest('/user', 'PUT', updateData);
 				currentUser = updatedUser;
 				showError('Profile updated successfully!');
 				document.getElementById('own-profile-container').classList.add('hidden');
