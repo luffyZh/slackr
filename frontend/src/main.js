@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	let currentUser = null;
 	let currentChannel = null;
-
+	// FIXME: 初始化获取所有用户数据并存下来
+	const allUsers = [];
 
 	async function init() {
 		setTimeout(() => {
@@ -68,6 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		setupEventListeners();
 
 		if (isLoggedIn()) {
+			// FIXME: 登陆成功，初始化获取所有用户数据并存下来
+			const { users } = await apiRequest('/user');
+			allUsers.push(...users);
 			// FIXME: 初始化获取 userId
 			const userId = localStorage.getItem('userId');
 			console.log('isLogined: ', isLoggedIn(), 'userId: ', userId);
@@ -233,11 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			localStorage.setItem(STORAGE_KEY, data.token);
 			// FIXME: 这里处理登录后获取用户信息的逻辑，尽量不修改你的原本代码
-			const user = await apiRequest(`/user/${data.userId}`);
 			currentUser = {
 				id: +data.userId,
-				...user
+				email,
 			};
+			// FIXME: 登陆成功，初始化获取所有用户数据并存下来
+			const { users } = await apiRequest('/user');
+			allUsers.push(...users);
 			// FIXME: 缓存 userId 下来
 			localStorage.setItem('userId', data.userId);
 			showDashboard();
@@ -269,7 +275,16 @@ document.addEventListener('DOMContentLoaded', () => {
 			}, false);
 
 			localStorage.setItem(STORAGE_KEY, data.token);
-			currentUser = data.user;
+			// FIXME: 缓存 userId 下来
+			localStorage.setItem('userId', data.userId);
+			currentUser = {
+				id: +data.userId,
+				email,
+				name,
+			};
+			// FIXME: 注册成功，初始化获取所有用户数据并存下来
+			const { users } = await apiRequest('/user');
+			allUsers.push(...users);
 			showDashboard();
 			loadChannels();
 			registerForm.reset();
@@ -293,8 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		clearElement(publicChannelList);
 		clearElement(privateChannelList);
 
-		const publicChannels = channels.filter(channel => !channel.isPrivate);
-		const privateChannels = channels.filter(channel => channel.isPrivate);
+		const publicChannels = channels.filter(channel => !channel.private);
+		const privateChannels = channels.filter(channel => channel.private);
 
 		if (publicChannels.length === 0) {
 			const msg = document.createElement('div');
@@ -323,13 +338,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function createChannelElement(channel) {
 		const div = document.createElement('div');
-		div.className = `channel-container ${channel.isPrivate ? 'private' : 'public'}`;
+		div.className = `channel-container ${channel.private ? 'private' : 'public'}`;
 		div.dataset.channelId = channel.id;
 
 		const nameDiv = document.createElement('div');
 		nameDiv.className = 'channel-name';
 		nameDiv.textContent = channel.name;
-
 
 		if (channel.unreadCount > 0) {
 			const unreadBadge = document.createElement('span');
@@ -340,8 +354,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		div.appendChild(nameDiv);
 
+		// FIXME: 如果没有在当前频道 members 列表中，右侧应该显示 Join 按钮
+		const isJoined = channel.members.includes(currentUser.id);
+		if (!isJoined) {
+			const joinBtn = document.createElement('button');
+			joinBtn.textContent = 'Join';
+			joinBtn.className = 'join-btn';
+			joinBtn.addEventListener('click', async (e) => {
+				e.stopPropagation();
+				try {
+					await apiRequest(`/channel/${channel.id}/join`, 'POST');
+					loadChannels();
+				} catch (error) {
+					console.error('Failed to join channel:', error);
+				}
+			});
+			nameDiv.appendChild(joinBtn);
+		}
 
-		div.addEventListener('click', async () => {
+		nameDiv.addEventListener('click', async () => {
 			currentChannel = channel;
 			window.location.hash = `#channel=${channel.id}`;
 			loadChannelDetails();
@@ -371,10 +402,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		try {
-			await apiRequest('/channels', 'POST', {
+			await apiRequest('/channel', 'POST', {
 				name,
 				description,
-				isPrivate
+				private: isPrivate,
 			});
 
 			createChannelContainer.classList.add('hidden');
@@ -420,30 +451,24 @@ document.addEventListener('DOMContentLoaded', () => {
 			createdStrong.textContent = 'Created:';
 			createdP.appendChild(createdStrong);
 			createdP.appendChild(
-				document.createTextNode(' ' + formatDate(details.timeCreated))
+				// FIXME: 后端返回字段是 createdAt，前端需要转换为 Date 对象
+				document.createTextNode(' ' + formatDate(new Date(details.createdAt)))
 			);
 			container.appendChild(createdP);
 
+			// FIXME: details.creator 是用户 id，需要从 allUsers 中找到对应的用户
+			const creator = allUsers.find(user => user.id === details.creator);
 			const creatorP = document.createElement('p');
 			const creatorStrong = document.createElement('strong');
 			creatorStrong.textContent = 'Creator:';
 			creatorP.appendChild(creatorStrong);
 			creatorP.appendChild(
-				document.createTextNode(' ' + details.creator.name)
+				document.createTextNode(' ' + creator?.email || 'Unknown')
 			);
 			container.appendChild(creatorP);
 
-			const inviteBtn = document.createElement('button');
-			inviteBtn.id = 'invite-user-button';
-			inviteBtn.textContent = 'Invite Users';
-			container.appendChild(inviteBtn);
-
 			container.classList.remove('hidden');
 
-			inviteBtn.addEventListener('click', () => {
-				document.getElementById('channel-invite-container').classList.remove('hidden');
-				loadUsersToInvite();
-			});
 		} catch (error) {
 			console.error('Failed to load channel details:', error);
 		}
@@ -538,14 +563,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	function createMessageElement(message) {
 		const div = document.createElement('div');
 		div.className = 'message-container';
+		// FIXME: 确定发送者是谁
+		const sender = allUsers.find(user => user.id === message.sender);
 
 		// FIXME: 不确定是否有 user 这个对象
-		const avatarUrl = message?.user?.profileImage || 'default-avatar.png';
+		const avatarUrl = message.sender === currentUser.id ? 'me.png' : sender?.profileImage || 'default-avatar.png';
 
 		const avatarImg = document.createElement('img');
 		avatarImg.className = 'message-avatar';
 		// FIXME: 不确定是否有 user 这个对象
-		avatarImg.alt = message?.user?.name || 'Unknown User';
+		avatarImg.alt = sender?.email || 'Unknown User';
 		avatarImg.src = avatarUrl;
 		div.appendChild(avatarImg);
 
@@ -560,19 +587,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		const nameSpan = document.createElement('span');
 		nameSpan.className = 'message-user-name';
 		// FIXME: 不确定是否有 user 这个对象
-		nameSpan.dataset.userId = message?.user?.id || 'unknown';
-		nameSpan.textContent = message?.user?.name || 'Unknown User';
+		nameSpan.dataset.userId = sender?.id || 'unknown';
+		nameSpan.textContent = sender?.email || 'Unknown User';
 		headerDiv.appendChild(nameSpan);
 
 		const timeSpan = document.createElement('span');
 		timeSpan.className = 'message-timestamp';
-		timeSpan.textContent = formatDate(message.timeSent);
+		// FIXME: 确定时间戳的格式
+		timeSpan.textContent = formatDate(new Date(message.sentAt));
 		headerDiv.appendChild(timeSpan);
 
 		if (message.edited) {
 			const editedSpan = document.createElement('span');
 			editedSpan.className = 'message-edited';
-			editedSpan.textContent = `Edited ${formatDate(message.edited)}`;
+			editedSpan.textContent = `Edited ${formatDate(new Date(message.edited))}`;
 			headerDiv.appendChild(editedSpan);
 		}
 
@@ -871,10 +899,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				const bio = bioTextarea.value.trim();
 				const newPassword = pwInput.value.trim();
 
-				const updateData = { name, email, bio };
+				const updateData = { name, bio };
 				if (newPassword) updateData.password = newPassword;
-
-				const updatedUser = await apiRequest('/users/me', 'PATCH', updateData);
+				// FIXME: 更新个人信息
+				const updatedUser = await apiRequest('/user', 'PUT', updateData);
 				currentUser = updatedUser;
 				showError('Profile updated successfully!');
 				document.getElementById('own-profile-container').classList.add('hidden');
