@@ -467,17 +467,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			);
 			container.appendChild(creatorP);
 
-			const inviteBtn = document.createElement('button');
-			inviteBtn.id = 'invite-user-button';
-			inviteBtn.textContent = 'Invite Users';
-			container.appendChild(inviteBtn);
-
 			container.classList.remove('hidden');
 
-			inviteBtn.addEventListener('click', () => {
-				document.getElementById('channel-invite-container').classList.remove('hidden');
-				loadUsersToInvite();
-			});
 		} catch (error) {
 			console.error('Failed to load channel details:', error);
 		}
